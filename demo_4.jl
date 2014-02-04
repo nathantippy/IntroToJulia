@@ -1,56 +1,82 @@
 #!/usr/bin/julia
 
-println("Code Generation")
+println("Type arguments and multiple dispatch")
 println("-------------------------")
 
-#this is already done in Base module so we will be getting a warning.
-for op = (:+, :*, :&, :|, :$)
-  eval(:(($op)(a,b,c) = ($op)(($op)(a,b),c)))
+
+#Struct style types: can not have sub types but can be instantiated
+#Abstract types: can have sub types but can not be instantiated
+ 
+
+abstract Ship
+
+abstract SeaCraft <: Ship
+abstract SpaceCraft <: Ship
+
+abstract StarShipClass
+abstract Constitution <: StarShipClass
+abstract Galaxy <: StarShipClass
+
+type FederationStarShip{StarShipClass} <: SpaceCraft
+	topspeed
+	nominalcrewsize::Int
+	name::String
 end
 
-println(*(2,3,4))
-
-quit()
-
-s = 13
-radians = convert(Float64,.75)
-
-array = zeros(Int128,s,s)
-array[1,1] = 1
-array[2,2] = 1
-r = 3
-expr = :(0)
-while r<=s
-   c = 1   
-   while c<=r 
-      #two times one up and to the left
-	  t = c <= 1 ? 0 : 2*array[r-1,c-1]
-      #minus value two rows above
-	  if (r>2)
-	  	t = t - array[r-2,c]
-      end
-      array[r,c] =  t
-	  if t!=0 && r==s
-		expr = :(($expr)+(($t)x^($(c-1))))
-	  end
-	  c=c+1
-   end
-   r=r+1
+type Tardis <: SpaceCraft
+	tardistype
+	nominalcrewsize::Int
+	name::String
 end
-eval(:(multiAngleCos(x) = ($expr)   )    ) 	
-println(array)
 
-fraction = radians/(s-1);
+immutable BlackPearl <: SeaCraft
+	nominalcrewsize::Int  
+	name::String
+	BlackPearl() = new(42,"BlackPearl") #one and only constructor
+end
 
-println("computed cos($(radians)) from cos($(fraction)) using $(s-1) angle formula.")
 
-v1 = cos(radians)
-v2 = multiAngleCos(cos(fraction))
-println("v1:",v1)
-println("v2:",v2)
-println("dif:$(v1-v2)")
+function launch(ship::FederationStarShip)
+	println("Engage...")
+end
 
-println(expr)
+function launch(ship::Tardis) 
+	println("Time rotor begins to move")
+end
+
+function launch(ship::SeaCraft)
+	println("Aweigh anchor")
+end
+
+function shipname(ship::Ship) 
+	return ship.name
+end
+function shipname(ship::Tardis) 
+	return "TARDIS"
+end
+
+
+ships = [FederationStarShip{Galaxy}(9,100,"Enterprise"),
+         Tardis(40,6,"Sexy"), 
+         BlackPearl()]
+
+println(ships)
+
+names = map(shipname,ships)
+println([names ships])
+
+
+map(ships) do s
+	println("$(shipname(s)) is now launching") 
+	launch(s)
+	println()
+end
+
+
+
+println(methods(launch))
+ 
+
 
 
 

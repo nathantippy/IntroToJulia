@@ -4,7 +4,7 @@ import Base.readline
 
 readline(f, io, prompt = "enter degrees <enter to exit>:") =  
 	begin 
-		print(prompt); 
+                print(prompt)
 		f(readline(io)) 
 	end
 

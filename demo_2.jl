@@ -21,6 +21,13 @@ end
 
 f(ex)
 
+#this is already done in Base module so we will be getting a warning.
+for op = (:+, :*, :&, :|, :$)
+  eval(:(($op)(a,b,c) = ($op)(($op)(a,b),c)))
+end
+
+println(*(2,3,4))
+
 ##Example macros, note the different "quoting" styles
 # macro assert(ex)
 #    :($ex ? nothing : error("Assertion failed: ", $(string(ex))))
